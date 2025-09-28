@@ -1,0 +1,79 @@
+{
+    "[javascript]": {
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": null
+    },
+    "[javascriptreact]": {
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": null
+    },
+    "[json]": {
+        "editor.tabSize": 4,
+        "editor.indentSize": "tabSize",
+        "editor.insertSpaces": true
+    },
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true
+    },
+
+    "breadcrumbs.enabled": false,
+    "css.validate": false,
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "files.insertFinalNewline": true,
+    "files.eol": "\n",
+    "javascript.format.enable": false,
+    "javascript.preferences.importModuleSpecifier": "shortest",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "always",
+        "source.fixAll.markdownlint": "always",
+        "source.addMissingImports": "always"
+    },
+    "editor.cursorBlinking": "phase",
+    "editor.cursorSmoothCaretAnimation": "explicit",
+    "editor.cursorStyle": "line",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.fontLigatures": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "editor.minimap.enabled": false,
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "editor.renderWhitespace": "none",
+    "editor.scrollbar.verticalScrollbarSize": 8,
+    "editor.trimAutoWhitespace": true,
+    "explorer.decorations.badges": false,
+
+    "prettier.configPath": "./prettier.config.mjs",
+    "search.exclude": {
+        "package-lock.json": true
+    },
+    "tailwindCSS.experimental.classRegex": [
+        ["cva(?:<[^>]*>)?(([^)]*))", "[\"'`]([^\"'`]*).*?[\"'`]", "(?:twMerge|twJoin)\\(([^\\);]*)[\\);]"]
+    ],
+
+    "typescript.preferences.importModuleSpecifier": "shortest",
+    // Use the workspace version of TypeScript
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    // For security reasons it's require that users opt into using the workspace version of typescript
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "typescript.preferences.autoImportFileExcludePatterns": [
+        // useRouter should be imported from `next/navigation` instead of `next/router`
+        "next/router.d.ts",
+        "next/dist/client/router.d.ts"
+    ],
+    // Prefer type-only imports
+    "typescript.preferences.preferTypeOnlyAutoImports": true,
+
+    // Replace this with your desired color theme
+    "workbench.colorTheme": "Tokyo Night Storm"
+}
