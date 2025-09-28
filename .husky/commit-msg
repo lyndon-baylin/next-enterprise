@@ -1,0 +1,4 @@
+#!/bin/sh
+# Run `commitlint` on commit message.
+# The `--no --` flag is used to indicate that the rest of the command should be executed as a shell command.
+pnpm exec commitlint --edit "$1"

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Run lint-staged on staged files.
+# The `--concurrent false` flag will ensure that lint-staged runs sequentially, rather than in parallel.
+pnpm exec lint-staged --concurrent false
