@@ -1,0 +1,40 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+    "extends": ["config:recommended", ":dependencyDashboard", ":semanticCommits", ":prConcurrentLimit10"],
+
+    "pnpm": { "enabled": true },
+
+    "vulnerabilityAlerts": { "enabled": true },
+    "osvVulnerabilityAlerts": true,
+
+    "lockFileMaintenance": {
+        "enabled": true,
+        "schedule": ["before 3am on Monday"]
+    },
+
+    "labels": ["dependencies"],
+
+    "packageRules": [
+        {
+            "groupName": "eslint & lint deps",
+            "matchPackagePatterns": ["^eslint", "lint", "prettier", "stylelint"]
+        },
+        {
+            "groupName": "typescript & tooling",
+            "matchPackagePatterns": ["^typescript", "ts-node", "ts-jest"]
+        },
+        {
+            "groupName": "testing deps",
+            "matchPackagePatterns": ["^jest", "^vitest", "playwright", "cypress"]
+        },
+        {
+            "groupName": "next.js & react ecosystem",
+            "matchPackagePatterns": ["^next", "^react", "^react-dom"]
+        },
+        {
+            "matchDepTypes": ["devDependencies"],
+            "automerge": true
+        }
+    ]
+}
