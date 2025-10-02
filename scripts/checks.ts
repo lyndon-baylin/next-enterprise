@@ -1,23 +1,39 @@
 // scripts/checks.ts
+
+import chalk from 'chalk';
+
 import { execSync } from 'child_process';
 
-function runCheck(command: string, successMsg: string, failMsg: string) {
+/**
+ * Runs a check command and logs success or failure messages.
+ * @param {string} command The command to run.
+ * @param {string} successMsg The message to log on success.
+ * @param {string} failMsg The message to log on failure.
+ */
+function runCheck(command: string, label: string, successMsg: string, failMsg: string) {
+  console.log('\n🔍 ' + chalk.gray(`${label} in progress…`));
+  console.time('⏱️ ' + chalk.cyan(`${label} duration`));
   try {
     execSync(command, { stdio: 'inherit' });
-    console.log(`\n✅ ${successMsg}`);
+    console.timeEnd('⏱️ ' + chalk.cyan(`${label} duration`));
+    console.log('✅ ' + chalk.greenBright(successMsg));
   } catch {
-    console.error(`\n❌ ${failMsg}`);
+    console.timeEnd('⏱️ ' + chalk.cyan(`${label} duration`));
+    console.error('❌ ' + chalk.redBright(failMsg));
     process.exit(1);
   }
 }
 
 runCheck(
   'eslint . "**/*.{js,jsx,ts,tsx}"',
+  'Linting',
   'Linting passed. Your code is clean and mean!',
   'Linting failed. Fix issues before committing.'
 );
+
 runCheck(
   'tsc --noEmit',
+  'Type-checking',
   'Type-checking passed. Your types are solid.',
   'Type-checking failed. Fix type errors before proceeding.'
 );
