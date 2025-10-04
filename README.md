@@ -52,7 +52,7 @@ Below is the list of enum-type rules and its description
 - `ci` Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
 - `docs` Documentation only changes
 - `feat` A new feature
-- `fix`  A bug fix
+- `fix` A bug fix
 - `perf` A code change that improves performance
 - `refactor` A code change that neither fixes a bug nor adds a feature
 - `revert` Reverts a previous commit
