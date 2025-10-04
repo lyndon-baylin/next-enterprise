@@ -1,6 +1,26 @@
 /** @type {import('stylelint').Config} */
 const stylelintConfig = {
   extends: ['stylelint-config-standard'],
+  ignoreFiles: [
+    '**/*.js',
+    '**/*.jsx',
+    '**/*.ts',
+    '**/*.tsx',
+    '.git/**',
+    '.next/**',
+    'node_modules/**',
+    'dist/**',
+    'out/**',
+    'build/**',
+    'coverage/**',
+    'html/**',
+    '*.min.js',
+    '*.config.js',
+    '*.config.ts',
+    '*.config.mjs',
+    '*.d.ts',
+    'tsconfig*.json',
+  ],
   rules: {
     'color-no-invalid-hex': true,
     'color-function-notation': null,
