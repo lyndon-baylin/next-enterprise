@@ -32,10 +32,29 @@
         "**/*.ts",
         "**/*.tsx",
         "**/*.mjs",
-        "types/**/*.d.ts",
+        "./types/**/*.ts", // This includes the shim for Next.js' virtual fonts
         "vitest.config.ts",
         ".next/types/**/*.ts",
         "eslint.config.mjs"
     ],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules"],
+    "overrides": [
+        {
+            "files": [".storybook/**/*.{ts,tsx}"],
+            "parserOptions": {
+                "project": "./tsconfig.storybook.json"
+            },
+            // practical, minimal set of ESLint rule relaxations for Storybook configs.
+            "rules": {
+                // Allow require() since Storybook sometimes needs it
+                "@typescript-eslint/no-var-requires": "off",
+                // Allow default exports in config files (main.ts, preview.ts)
+                "import/no-default-export": "off",
+                // Don't force strict return types in config helpers
+                "@typescript-eslint/explicit-module-boundary-types": "off",
+                // Turn off prop-types since we use TS anyway
+                "react/prop-types": "off"
+            }
+        }
+    ]
 }
