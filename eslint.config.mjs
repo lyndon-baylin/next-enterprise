@@ -1,14 +1,26 @@
 import eslintPluginNext from '@next/eslint-plugin-next';
+import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginImport from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettier from 'eslint-plugin-prettier';
+import eslintPluginStorybook from 'eslint-plugin-storybook';
+import unusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 
-import { getInternalDirs } from './utils/get-internal-dirs.mjs';
+import fs from 'node:fs';
+
+function getDirectoriesToSort() {
+  const ignoredSortingDirectories = ['.git', '.next', '.vscode', 'node_modules'];
+  return fs
+    .readdirSync(process.cwd())
+    .filter((file) => fs.statSync(process.cwd() + '/' + file).isDirectory())
+    .filter((f) => !ignoredSortingDirectories.includes(f));
+}
 
 const eslintIgnore = [
   '.git/**',
   '.next/**',
+  '.next/types/**',
   'node_modules/**',
   'dist/**',
   'out/**',
@@ -23,28 +35,26 @@ const eslintIgnore = [
   'tsconfig*.json',
 ];
 
-// Collect physical + alias dirs from tsconfig
-const internalDirs = getInternalDirs();
-
 const eslintConfig = [
   {
     ignores: eslintIgnore,
   },
+
+  // Storybook, Import, NextJS
+  ...eslintPluginStorybook.configs['flat/recommended'],
 
   // ✅ Base + strict + stylistic configs
   ...tseslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
 
-  // Storybook, Import, NextJS
-  // ...eslintPluginStorybook.configs['flat/recommended'],
   eslintPluginImport.flatConfigs.recommended,
 
   {
     files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json'], // enable type-aware linting
+        project: ['./tsconfig.json', './tsconfig.storybook.json'], // enable type-aware linting
         tsconfigRootDir: import.meta.dirname,
         ecmaFeatures: { jsx: true },
       },
@@ -53,11 +63,28 @@ const eslintConfig = [
       '@next/next': eslintPluginNext,
       'jsx-a11y': jsxA11y,
       prettier: prettier,
+      'unused-imports': unusedImports,
     },
     rules: {
       ...eslintPluginNext.configs.recommended.rules,
       ...eslintPluginNext.configs['core-web-vitals'].rules,
       ...jsxA11y.configs.recommended.rules,
+
+      // 🔥 unused imports cleanup
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
+      // 🎨 Prettier integration
+      'prettier/prettier': 'error',
     },
   },
 
@@ -74,10 +101,10 @@ const eslintConfig = [
           moduleDirectory: ['node_modules', 'src'],
         },
       },
+      // This tells ESLint to treat these fonts as “core modules” (no resolution needed).
+      'import/core-modules': ['geist/font/sans', 'geist/font/mono'],
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-
       'sort-imports': ['error', { ignoreCase: true, ignoreDeclarationSort: true }],
 
       'import/order': [
@@ -85,7 +112,7 @@ const eslintConfig = [
         {
           groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
           pathGroups: [
-            ...internalDirs.map((dir) => ({
+            ...getDirectoriesToSort().map((dir) => ({
               pattern: `${dir}/**`,
               group: 'internal',
             })),
@@ -133,6 +160,9 @@ const eslintConfig = [
       '@typescript-eslint/await-thenable': 'off', // ✅ turn off type-aware rule
     },
   },
+
+  // 🧹 Prettier conflict resolver
+  eslintConfigPrettier,
 ];
 
 export default eslintConfig;
