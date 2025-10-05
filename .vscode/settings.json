@@ -45,7 +45,7 @@
     "editor.formatOnSaveMode": "file",
     "editor.minimap.enabled": false,
     "editor.quickSuggestions": {
-        "strings": true
+        "strings": "on"
     },
     "editor.renderWhitespace": "none",
     "editor.scrollbar.verticalScrollbarSize": 8,
@@ -59,7 +59,10 @@
     "tailwindCSS.experimental.classRegex": [
         ["cva(?:<[^>]*>)?(([^)]*))", "[\"'`]([^\"'`]*).*?[\"'`]", "(?:twMerge|twJoin)\\(([^\\);]*)[\\);]"]
     ],
-
+    "tailwindCSS.includeLanguages": {
+        "typescriptreact": "html",
+        "javascriptreact": "html"
+    },
     "typescript.preferences.importModuleSpecifier": "shortest",
     // Use the workspace version of TypeScript
     "typescript.tsdk": "node_modules/typescript/lib",
