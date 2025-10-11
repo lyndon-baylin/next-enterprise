@@ -3,15 +3,16 @@ import Image from 'next/image';
 export default function Home() {
   return (
     <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-sans sm:p-20">
+      <h1 className="text-3xl font-semibold text-balance sm:text-4xl dark:text-white">Next Enterprise Boilerplate</h1>
       <main className="row-start-2 flex flex-col items-center gap-[32px] sm:items-start">
-        <Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
         <ol className="list-inside list-decimal text-center font-mono text-sm/6 sm:text-left">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{' '}
             <code className="rounded bg-black/[.05] px-1 py-0.5 font-mono font-semibold dark:bg-white/[.06]">
               src/app/page.tsx
             </code>
-            .
+            {''}
+            file.
           </li>
           <li className="tracking-[-.01em]">Save and see your changes instantly.</li>
         </ol>
@@ -38,7 +39,7 @@ export default function Home() {
       </main>
       <footer className="row-start-3 flex flex-wrap items-center justify-center gap-[24px]">
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-700 hover:underline hover:underline-offset-4 dark:text-white dark:hover:text-gray-400"
           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
           target="_blank"
           rel="noopener noreferrer"
@@ -47,7 +48,7 @@ export default function Home() {
           Learn
         </a>
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-700 hover:underline hover:underline-offset-4 dark:text-white dark:hover:text-gray-400"
           href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
           target="_blank"
           rel="noopener noreferrer"
@@ -56,7 +57,7 @@ export default function Home() {
           Examples
         </a>
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-700 hover:underline hover:underline-offset-4 dark:text-white dark:hover:text-gray-400"
           href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
           target="_blank"
           rel="noopener noreferrer"
