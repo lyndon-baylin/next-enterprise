@@ -39,6 +39,7 @@ const stylelintConfig = {
         ignoreAtRules: ['extends', 'tailwind', 'tailwindcss', 'tw-animate-css', 'custom-variant', 'theme'],
       },
     ],
+    'selector-class-pattern': '^[a-z0-9\\-_]+$', // BEM friendly in favor for Storybook class names
   },
 };
 
