@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
   /* Config option for allowed origin regarding CORS concern */
   allowedDevOrigins: [
     'localhost:3000',
-    '127.0.0.1:3000', // Playwright uses this
+    '127.0.0.1', // Playwright uses this
   ],
 
   /*
