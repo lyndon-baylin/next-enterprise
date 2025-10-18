@@ -2,7 +2,7 @@
 
 import chalk from 'chalk';
 
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
 
 /**
  * Runs a check command and logs success or failure messages.
@@ -26,7 +26,7 @@ function runCheck(command: string, label: string, successMsg: string, failMsg: s
 
 runCheck(
   'stylelint "**/*.css" --fix',
-  'Fixing linting issues',
-  'Style issues are now fixed. Your css code is clean and mean!',
+  'Fixing',
+  'Linting issues are now fixed. Your css code is clean and mean!',
   'Fixing linting issues failed. Please try again.'
 );

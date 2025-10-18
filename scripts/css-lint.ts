@@ -2,7 +2,7 @@
 
 import chalk from 'chalk';
 
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
 
 /**
  * Runs a check command and logs success or failure messages.
@@ -25,15 +25,8 @@ function runCheck(command: string, label: string, successMsg: string, failMsg: s
 }
 
 runCheck(
-  'eslint . "**/*.{js,jsx,ts,tsx}"',
-  'Linting',
-  'Linting passed. Your code is clean and mean!',
+  'stylelint "**/*.css"',
+  'CSS linting',
+  'Linting passed. Your css code is clean and mean!',
   'Linting failed. Fix issues before committing.'
-);
-
-runCheck(
-  'tsc --noEmit',
-  'Type-checking',
-  'Type-checking passed. Your types are solid.',
-  'Type-checking failed. Fix type errors before proceeding.'
 );
