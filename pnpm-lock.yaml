@@ -13,6 +13,12 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/geist':
+        specifier: 5.2.8
+        version: 5.2.8
+      '@fontsource-variable/geist-mono':
+        specifier: 5.2.7
+        version: 5.2.7
       '@next/bundle-analyzer':
         specifier: 15.5.4
         version: 15.5.4
@@ -25,9 +31,6 @@ importers:
       clsx:
         specifier: 2.1.1
         version: 2.1.1
-      geist:
-        specifier: ^1.5.1
-        version: 1.5.1(next@15.5.4(@babel/core@7.28.4)(@playwright/test@1.55.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       next:
         specifier: 15.5.4
         version: 15.5.4(@babel/core@7.28.4)(@playwright/test@1.55.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -691,6 +694,12 @@ packages:
   '@eslint/plugin-kit@0.3.5':
     resolution: {integrity: sha512-Z5kJ+wU3oA7MMIqVR9tyZRtjYPr4OC004Q4Rw7pgOKUOKkJfZ3O24nz3WYfGRpMDNmcOi3TwQOmgm7B7Tpii0w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource-variable/geist-mono@5.2.7':
+    resolution: {integrity: sha512-ZKlZ5sjtalb2TwXKs400mAGDlt/+2ENLNySPx0wTz3bP3mWARCsUW+rpxzZc7e05d2qGch70pItt3K4qttbIYA==}
+
+  '@fontsource-variable/geist@5.2.8':
+    resolution: {integrity: sha512-cJ6m9e+8MQ5dCYJsLylfZrgBh6KkG4bOLckB35Tr9J/EqdkEM6QllH5PxqP1dhTvFup+HtMRPuz9xOjxXJggxw==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2695,11 +2704,6 @@ packages:
 
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
-
-  geist@1.5.1:
-    resolution: {integrity: sha512-mAHZxIsL2o3ZITFaBVFBnwyDOw+zNLYum6A6nIjpzCGIO8QtC3V76XF2RnZTyLx1wlDTmMDy8jg3Ib52MIjGvQ==}
-    peerDependencies:
-      next: '>=13.2.0'
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -5214,6 +5218,10 @@ snapshots:
       '@eslint/core': 0.15.2
       levn: 0.4.1
 
+  '@fontsource-variable/geist-mono@5.2.7': {}
+
+  '@fontsource-variable/geist@5.2.8': {}
+
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.7':
@@ -7340,10 +7348,6 @@ snapshots:
       is-callable: 1.2.7
 
   functions-have-names@1.2.3: {}
-
-  geist@1.5.1(next@15.5.4(@babel/core@7.28.4)(@playwright/test@1.55.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
-    dependencies:
-      next: 15.5.4(@babel/core@7.28.4)(@playwright/test@1.55.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   gensync@1.0.0-beta.2: {}
 

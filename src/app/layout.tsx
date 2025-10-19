@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
-import { GeistMono, GeistSans } from '@/fonts';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 
 import './globals.css';
 
@@ -16,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

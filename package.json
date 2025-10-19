@@ -34,11 +34,12 @@
         "coupling-graph": "tsx scripts/coupling-graph.ts"
     },
     "dependencies": {
+        "@fontsource-variable/geist": "5.2.8",
+        "@fontsource-variable/geist-mono": "5.2.7",
         "@next/bundle-analyzer": "15.5.4",
         "@t3-oss/env-nextjs": "0.13.8",
         "class-variance-authority": "0.7.1",
         "clsx": "2.1.1",
-        "geist": "^1.5.1",
         "next": "15.5.4",
         "react": "19.1.0",
         "react-dom": "19.1.0",
