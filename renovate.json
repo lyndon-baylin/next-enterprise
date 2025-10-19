@@ -1,40 +1,70 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-    "extends": ["config:recommended", ":dependencyDashboard", ":semanticCommits", ":prConcurrentLimit10"],
+    // --- Base behavior ---
+    "extends": [
+        "config:recommended",
+        ":dependencyDashboard",
+        ":semanticCommits",
+        ":prConcurrentLimit10",
+        ":automergeBranch",
+        ":automergeMinor"
+    ],
 
     "pnpm": { "enabled": true },
-
     "vulnerabilityAlerts": { "enabled": true },
     "osvVulnerabilityAlerts": true,
 
+    // --- Keep your lockfile healthy ---
     "lockFileMaintenance": {
         "enabled": true,
         "schedule": ["before 3am on Monday"]
     },
 
+    // --- General metadata ---
     "labels": ["dependencies"],
+    "timezone": "Asia/Manila",
+    "schedule": ["after 12am and before 5am on monday to friday"],
+    "rangeStrategy": "bump",
 
+    // --- Rules for grouping and merging ---
     "packageRules": [
         {
             "groupName": "eslint & lint deps",
-            "matchPackagePatterns": ["^eslint", "lint", "prettier", "stylelint"]
+            "matchPackagePatterns": ["^eslint", "lint", "prettier", "stylelint"],
+            "schedule": ["every weekend"]
         },
         {
             "groupName": "typescript & tooling",
-            "matchPackagePatterns": ["^typescript", "ts-node", "ts-jest"]
+            "matchPackagePatterns": ["^typescript", "ts-node", "ts-jest"],
+            "automerge": false
         },
         {
             "groupName": "testing deps",
-            "matchPackagePatterns": ["^jest", "^vitest", "playwright", "cypress"]
+            "matchPackagePatterns": ["^jest", "^vitest", "playwright", "cypress", "@testing-library/"],
+            // patch updates only auto-merge
+            "matchUpdateTypes": ["patch"],
+            "automerge": true,
+            "schedule": ["every weekend"]
+        },
+        {
+            "groupName": "storybook deps",
+            "matchPackagePatterns": ["^storybook", "@storybook/"],
+            "matchUpdateTypes": ["patch"],
+            "automerge": true,
+            "schedule": ["every weekend"]
         },
         {
             "groupName": "next.js & react ecosystem",
-            "matchPackagePatterns": ["^next", "^react", "^react-dom"]
+            "matchPackagePatterns": ["^next", "^react", "^react-dom"],
+            "automerge": false // manual review for safety
         },
         {
             "matchDepTypes": ["devDependencies"],
+            "matchUpdateTypes": ["minor", "patch"],
             "automerge": true
         }
-    ]
+    ],
+    // --- Optional: Ignore noisy or risky deps ---
+    "ignoreDeps": ["typescript", "next", "react", "react-dom"]
 }
