@@ -1,21 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
-
-import { GeistMono, GeistSans } from '@/fonts';
-
-vi.mock('geist/font/sans', () => ({
-  GeistSans: () => ({
-    className: 'geistSans',
-    variable: '--font-geist-sans',
-  }),
-}));
-
-vi.mock('geist/font/mono', () => ({
-  GeistMono: () => ({
-    className: 'geistMono',
-    variable: '--font-geist-mono',
-  }),
-}));
 
 /**
  * A root layout body component that wraps the children in a div with Geist fonts.
@@ -28,7 +11,7 @@ vi.mock('geist/font/mono', () => ({
  * @note This only exist to satisfy the layout testing.
  */
 function RootLayoutBody({ children }: Readonly<{ children: React.ReactNode }>): React.ReactElement {
-  return <div className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>{children}</div>;
+  return <div className={`antialiased`}>{children}</div>;
 }
 
 test('Renders layout with children', () => {
