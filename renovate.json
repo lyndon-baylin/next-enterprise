@@ -11,7 +11,6 @@
         ":automergeMinor"
     ],
 
-    "pnpm": { "enabled": true },
     "vulnerabilityAlerts": { "enabled": true },
     "osvVulnerabilityAlerts": true,
 
