@@ -1,7 +1,6 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-    // --- Base behavior ---
     "extends": [
         "config:recommended",
         ":dependencyDashboard",
@@ -14,19 +13,16 @@
     "vulnerabilityAlerts": { "enabled": true },
     "osvVulnerabilityAlerts": true,
 
-    // --- Keep your lockfile healthy ---
     "lockFileMaintenance": {
         "enabled": true,
         "schedule": ["before 3am on Monday"]
     },
 
-    // --- General metadata ---
     "labels": ["dependencies"],
     "timezone": "Asia/Manila",
     "schedule": ["after 12am and before 5am on monday to friday"],
     "rangeStrategy": "bump",
 
-    // --- Rules for grouping and merging ---
     "packageRules": [
         {
             "groupName": "eslint & lint deps",
@@ -41,7 +37,6 @@
         {
             "groupName": "testing deps",
             "matchPackagePatterns": ["^jest", "^vitest", "playwright", "cypress", "@testing-library/"],
-            // patch updates only auto-merge
             "matchUpdateTypes": ["patch"],
             "automerge": true,
             "schedule": ["every weekend"]
@@ -56,7 +51,7 @@
         {
             "groupName": "next.js & react ecosystem",
             "matchPackagePatterns": ["^next", "^react", "^react-dom"],
-            "automerge": false // manual review for safety
+            "automerge": false
         },
         {
             "matchDepTypes": ["devDependencies"],
@@ -64,6 +59,6 @@
             "automerge": true
         }
     ],
-    // --- Optional: Ignore noisy or risky deps ---
+
     "ignoreDeps": ["typescript", "next", "react", "react-dom"]
 }
