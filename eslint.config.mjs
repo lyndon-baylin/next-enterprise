@@ -10,17 +10,18 @@ import tseslint from 'typescript-eslint';
 import fs from 'node:fs';
 
 function getDirectoriesToSort() {
-  const ignoredSortingDirectories = ['.git', '.next', '.vscode', 'node_modules'];
+  const ignoredSortingDirectories = new Set(['.git', '.next', '.vscode', 'node_modules']);
   return fs
     .readdirSync(process.cwd())
     .filter((file) => fs.statSync(process.cwd() + '/' + file).isDirectory())
-    .filter((f) => !ignoredSortingDirectories.includes(f));
+    .filter((f) => !ignoredSortingDirectories.has(f));
 }
 
 const eslintIgnore = [
   '.git/**',
   '.next/**',
   '.next/types/**',
+  '.next/dev/types/**',
   'node_modules/**',
   'dist/**',
   'out/**',
