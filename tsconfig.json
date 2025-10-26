@@ -16,7 +16,7 @@
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "jsx": "preserve",
+        "jsx": "react-jsx",
         "incremental": true,
         "types": ["node", "vitest/globals", "@testing-library/jest-dom"],
         "plugins": [
@@ -36,7 +36,9 @@
         "./types/**/*.ts", // This includes the shim for Next.js' virtual fonts
         "vitest.config.ts",
         ".next/types/**/*.ts",
-        "eslint.config.mjs"
+        "eslint.config.mjs",
+        ".next/dev/types/**/*.ts", // Other OS aside from Windows
+        ".next\\dev/types/**/*.ts" // Remove this later on once Next.js supports Windows path properly
     ],
     "exclude": ["node_modules"],
     "overrides": [
