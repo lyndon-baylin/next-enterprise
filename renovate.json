@@ -6,6 +6,7 @@
         ":dependencyDashboard",
         ":semanticCommits",
         ":prConcurrentLimit10",
+        ":prHourlyLimit2",
         ":automergeBranch",
         ":automergeMinor"
     ],
@@ -61,8 +62,5 @@
         }
     ],
 
-    "ignoreDeps": ["typescript", "next", "react", "react-dom"],
-
-    "limitHourly": 2,
-    "limitConcurrent": 1
+    "ignoreDeps": ["typescript", "next", "react", "react-dom"]
 }
