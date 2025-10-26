@@ -7,14 +7,6 @@ const nextConfig: NextConfig = {
   /* Enable React Strict Mode */
   reactStrictMode: true,
 
-  /* Eslint config */
-  eslint: {
-    // ✅ disable build-time linting (we enforce elsewhere)
-    ignoreDuringBuilds: true,
-    // optional: explicitly tell Next which dirs to lint if you re-enable
-    dirs: ['src'],
-  },
-
   /* Config option for allowed origin regarding CORS concern */
   allowedDevOrigins: [
     'localhost:3000',
