@@ -118,7 +118,7 @@
         "overrides": {
             "glob": "^10.4.5",
             "inflight": "npm:@empty:0.0.0",
-            "rimraf": "^5.0.10"
+            "rimraf": "^6.1.0"
         }
     }
 }
