@@ -16,51 +16,83 @@
 
     "labels": ["dependencies"],
     "timezone": "Asia/Manila",
-    "schedule": ["after 1am and before 4am on monday to friday"],
+
+    "schedule": ["on the 17th day of the month after 1am and before 4am"],
     "rangeStrategy": "bump",
 
     "lockFileMaintenance": {
         "enabled": true,
-        "schedule": ["before 3am on Monday"]
+        "schedule": ["on the 17th day of the month before 3am"],
+        "dependencyDashboardApproval": true,
+        "labels": ["lockfile-maintenance"]
     },
 
     "packageRules": [
         {
             "groupName": "lint & formatting",
-            "schedule": ["every weekend"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
             "matchPackageNames": ["/eslint/", "/lint/", "/prettier/", "/stylelint/"],
             "automerge": true
         },
         {
-            "groupName": "typescript & build tooling",
-            "matchPackageNames": ["/^typescript/", "/ts-node/", "/ts-jest/"],
+            "groupName": "typescript core (minor & patch)",
+            "matchPackageNames": ["typescript"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
+            "automerge": false
+        },
+        {
+            "groupName": "typescript core (major upgrades)",
+            "matchPackageNames": ["typescript"],
+            "matchUpdateTypes": ["major"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
+            "labels": ["major-upgrade"],
+            "dependencyDashboardApproval": true,
+            "prConcurrentLimit": 1,
+            "automerge": false
+        },
+        {
+            "groupName": "typescript tooling",
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
+            "matchPackageNames": ["/ts-node/", "/ts-jest/"],
             "automerge": false
         },
         {
             "groupName": "testing & QA",
-            "schedule": ["every weekend"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
             "matchPackageNames": ["/jest/", "/vitest/", "/playwright/", "/cypress/", "/@testing-library//"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true
         },
         {
             "groupName": "storybook ecosystem",
-            "schedule": ["every weekend"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
             "matchPackageNames": ["/^storybook/", "/@storybook//"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true
         },
         {
-            "groupName": "react & next.js core",
+            "groupName": "react & next.js core (minor & patch)",
             "matchPackageNames": ["/^react/", "/^react-dom/", "/^next/"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
+            "automerge": false
+        },
+        {
+            "groupName": "react & next.js core (major upgrades)",
+            "matchPackageNames": ["/^react/", "/^react-dom/", "/^next/"],
+            "matchUpdateTypes": ["major"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
+            "labels": ["major-upgrade"],
+            "dependencyDashboardApproval": true,
+            "prConcurrentLimit": 1,
             "automerge": false
         },
         {
             "matchDepTypes": ["devDependencies"],
+            "schedule": ["on the 17th day of the month after 1am and before 4am"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true
         }
-    ],
-
-    "ignoreDeps": ["typescript", "next", "react", "react-dom"]
+    ]
 }
