@@ -25,7 +25,7 @@ Below is the list of enum-type rules and its description
 - `security` Security fixes
 - `changeset` Changeset
 
-Below is the list scope-enum which required when committing into the repo
+Below is the list scope-enum which required when committing into the repo.
 
 - `api`
 - `app`
@@ -49,5 +49,5 @@ Below is the list scope-enum which required when committing into the repo
 - `utils`
 
 ```shell
-git commit -m "feat(api): add new endpoint for user authentication
+git commit -m "feat(api): add new endpoint for user authentication"
 ```
