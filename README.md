@@ -4,4 +4,4 @@ A production-ready Next.js boilerplate inspired by Blazity’s next-enterprise. 
 
 ## Getting Started
 
-See the 📚 [Documentation]('/docs/README.md') for details on getting started and on how to use this boilerplate.
+See the 📚 [Documentation]('docs/README.md') for details on getting started and on how to use this boilerplate.
