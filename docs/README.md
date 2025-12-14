@@ -4,6 +4,6 @@ This documentation is intended to give you a guide on how to use this boilerplat
 
 Let's get started with the documentation.
 
-1. [Quick Start]('/quickstart.md')
-2. [Repository Commit]('/repository-commit.md')
-3. [Dependency Maintenance]('/maintenance.md')
+1. [Quick Start]('quickstart.md')
+2. [Repository Commit]('repository-commit.md')
+3. [Dependency Maintenance]('maintenance.md')
