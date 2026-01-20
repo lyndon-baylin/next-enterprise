@@ -36,7 +36,7 @@
     "dependencies": {
         "@fontsource-variable/geist": "5.2.8",
         "@fontsource-variable/geist-mono": "5.2.7",
-        "@next/bundle-analyzer": "16.0.10",
+        "@next/bundle-analyzer": "16.1.4",
         "@t3-oss/env-nextjs": "0.13.10",
         "axios": "1.13.2",
         "class-variance-authority": "0.7.1",
