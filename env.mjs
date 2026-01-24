@@ -8,8 +8,17 @@ export const env = createEnv({
       .optional()
       .transform((value) => value === 'true'),
   },
-  client: {},
+
+  client: {
+    NEXT_PUBLIC_API_BASE_URL: z.string(),
+    NEXT_PUBLIC_API_REFRESH_URL: z.string(),
+    NEXT_PUBLIC_API_TIMEOUT: z.string(),
+  },
+
   runtimeEnv: {
     ANALYZE: process.env.ANALYZE,
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    NEXT_PUBLIC_API_REFRESH_URL: process.env.NEXT_PUBLIC_API_REFRESH_URL,
+    NEXT_PUBLIC_API_TIMEOUT: process.env.NEXT_PUBLIC_API_TIMEOUT,
   },
 });

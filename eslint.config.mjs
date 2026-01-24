@@ -71,6 +71,9 @@ const eslintConfig = [
       ...eslintPluginNext.configs['core-web-vitals'].rules,
       ...jsxA11y.configs.recommended.rules,
 
+      // ✅ Enforce curly braces on all control statements
+      curly: ['error', 'all'],
+
       // 🔥 unused imports cleanup
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
@@ -84,6 +87,7 @@ const eslintConfig = [
           argsIgnorePattern: '^_',
         },
       ],
+
       // 🎨 Prettier integration
       'prettier/prettier': 'error',
     },
