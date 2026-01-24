@@ -31,7 +31,9 @@
         "storybook": "cross-env FORCE_COLOR=1 storybook dev -p 6006",
         "build-storybook": "cross-env FORCE_COLOR=1 storybook build",
         "check-circular": "tsx scripts/check-circular.ts",
-        "coupling-graph": "tsx scripts/coupling-graph.ts"
+        "coupling-graph": "tsx scripts/coupling-graph.ts",
+        "ncu:check": "npx ncu",
+        "ncu:upgrade": "npx ncu --interactive --format group"
     },
     "dependencies": {
         "@fontsource-variable/geist": "5.2.8",
@@ -89,6 +91,7 @@
         "lint-staged": "16.2.7",
         "madge": "8.0.0",
         "mkdirp": "3.0.1",
+        "npm-check-updates": "19.3.1",
         "patch-package": "8.0.1",
         "playwright": "^1.57.0",
         "postcss": "8.5.6",
