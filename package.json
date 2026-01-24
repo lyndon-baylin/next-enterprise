@@ -8,7 +8,7 @@
         "dev": "cross-env FORCE_COLOR=1 next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "tsx scripts/lint.ts",
+        "lint": "tsx scripts/lint-check.ts",
         "lint:fix": "tsx scripts/lint-fix.ts",
         "css:lint": "tsx scripts/css-lint.ts",
         "css:lint-fix": "tsx scripts/css-lint-fix.ts",
