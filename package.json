@@ -8,8 +8,8 @@
         "dev": "cross-env FORCE_COLOR=1 next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "tsx scripts/lint.ts",
-        "lint:fix": "tsx scripts/lint-fix.ts",
+        "lint:fix": "tsx scripts/lint-check.ts --fix",
+        "lint:debug": "tsx scripts/lint-check.ts --debug",
         "css:lint": "tsx scripts/css-lint.ts",
         "css:lint-fix": "tsx scripts/css-lint-fix.ts",
         "prettier": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",
@@ -47,6 +47,7 @@
         "react": "19.2.3",
         "react-dom": "19.2.3",
         "tailwind-merge": "3.4.0",
+        "zustand": "5.0.9",
         "zod": "4.3.5"
     },
     "devDependencies": {
