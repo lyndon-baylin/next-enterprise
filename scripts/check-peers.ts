@@ -528,11 +528,15 @@ function printTextReport(summary: Summary, perPackage: Record<string, Summary>, 
   }
 }
 
+function isBlockingStatus(status: Issue['status']): boolean {
+  return status === 'missing' || status === 'mismatched';
+}
+
 function exitWithStatus(issues: Issue[]): never {
-  const hasBlockingIssues = issues.some((i) => i.status === 'missing' || i.status === 'mismatched');
+  const hasBlockingIssues = issues.some((i) => isBlockingStatus(i.status));
 
   if (!hasBlockingIssues) {
-    if (!JSON_OUT) console.log('\n🎉 All peer dependencies are satisfied!');
+    if (!JSON_OUT) console.log('\n🎉 All peer dependencies are satisfied (or only non-blocking warnings were found)!');
     process.exit(0);
   }
 
@@ -545,7 +549,6 @@ function exitWithStatus(issues: Issue[]): never {
   process.exit(0);
 }
 
-// -----------------------------
 // Run
 // -----------------------------
 
