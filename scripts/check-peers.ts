@@ -54,7 +54,7 @@ interface Summary {
   invalidVersion: number;
 }
 
-type Issue = {
+interface Issue {
   pkg: string;
   pkgVersion: string;
   peer: string;
@@ -65,7 +65,7 @@ type Issue = {
   searchedFrom?: string;
   reason?: string;
   suggestion?: string;
-};
+}
 
 // -----------------------------
 // CLI flags
@@ -275,14 +275,14 @@ function formatFixSuggestion(peer: string, range: string): string {
 // Refactor: Variant A (dispatch table for non-satisfied results)
 // -----------------------------
 
-type IssueHandlerCtx = {
+interface IssueHandlerCtx {
   base: Pick<Issue, 'pkg' | 'pkgVersion' | 'peer' | 'range' | 'status'>;
   peer: string;
   range: string;
   perPkg: Summary;
   global: Summary;
   issues: Issue[];
-};
+}
 
 type StatusHandler<T extends NonSatisfiedResult['status']> = (
   ctx: IssueHandlerCtx,
