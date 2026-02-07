@@ -97,6 +97,9 @@ const eslintConfig = [
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
 
+      // ✅ Strict braces for all control statements (app + config + scripts)
+      curly: ['error', 'all'],
+
       // Next.js / modern JSX transform
       'react/react-in-jsx-scope': 'off',
 
@@ -117,8 +120,8 @@ const eslintConfig = [
         },
       ],
 
-      // ✅ Strict braces for all control statements (app + config + scripts)
-      curly: ['error', 'all'],
+      // enforce interfaces for object shapes
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
 
       // Prettier integration
       'prettier/prettier': 'error',
@@ -213,6 +216,7 @@ const eslintConfig = [
   {
     files: [
       '**/*.config.{js,cjs,mjs,ts}',
+      'commitlint.config.{js,cjs,mjs,ts}',
       '**/eslint.config.{js,mjs,cjs,ts}',
       '**/vitest.config.{js,cjs,mjs,ts}',
       '**/vitest.*.config.{js,cjs,mjs,ts}',
@@ -229,7 +233,7 @@ const eslintConfig = [
 
       // --- Tiny, pragmatic relaxations for tooling code ---
       'no-console': 'off', // configs/scripts often log intentionally
-      '@typescript-eslint/no-var-requires': 'off', // some tooling still uses require()
+      '@typescript-eslint/no-require-imports': 'off', // some tooling still uses require()
 
       // If you use eslint-plugin-import rule `import/no-default-export`, config files often default export
       // (Only matters if you enable that rule elsewhere)
