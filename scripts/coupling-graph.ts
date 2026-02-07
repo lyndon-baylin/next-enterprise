@@ -1,6 +1,6 @@
-import chalk from 'chalk';
-
 import { execSync, spawnSync } from 'child_process';
+
+import chalk from 'chalk';
 
 // Helper: check if Graphviz is installed
 function hasGraphviz() {
