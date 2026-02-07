@@ -10,10 +10,12 @@
  * - Exits non-zero in CI or --strict mode if issues found
  *
  * Flags:
- *   --quiet     Only print satisfied checks? (prints only issues; still prints summaries)
- *   --json      Machine-readable JSON output
- *   --strict    Exit 1 if issues found (also enabled automatically when CI=true)
- *   --root <p>  Project root (defaults to .. relative to this script)
+ *   --quiet           Reduce output (suppresses satisfied lines)
+ *   --json            Machine-readable JSON output
+ *   --strict          Exit 1 if missing/mismatched peers found (also enabled automatically when CI=true)
+ *   --root <p>        Project root (defaults to .. relative to this script)
+ *   --only <pkg>      Only check peer deps declared by packages matching <pkg> (repeatable)
+ *   --peer <peerName> Only check peer deps whose name matches <peerName> (repeatable)
  */
 
 import fs from 'node:fs';
@@ -67,8 +69,13 @@ interface Issue {
   suggestion?: string;
 }
 
+interface Filters {
+  onlyPkgs: string[]; // match packages by name
+  peers: string[]; // match peer dependency name
+}
+
 // -----------------------------
-// CLI flags
+// CLI parsing
 // -----------------------------
 
 const argv = process.argv.slice(2);
@@ -78,11 +85,42 @@ const QUIET = args.has('--quiet');
 const JSON_OUT = args.has('--json');
 const STRICT = args.has('--strict') || process.env.CI === 'true';
 
+function readFlagValues(flag: string): string[] {
+  const out: string[] = [];
+
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] !== flag) continue;
+
+    const next = argv[i + 1];
+    if (typeof next !== 'string' || next.startsWith('--')) continue;
+
+    out.push(next);
+    i++; // skip the consumed value
+  }
+
+  return out;
+}
+
 const ROOT = (() => {
   const i = argv.indexOf('--root');
-  if (i !== -1 && argv[i + 1]) return path.resolve(argv[i + 1] ?? '');
-  return null;
+  if (i === -1) return null;
+
+  const next = argv[i + 1];
+  if (typeof next !== 'string' || next.startsWith('--')) return null;
+
+  return path.resolve(next);
 })();
+
+const filters: Filters = {
+  onlyPkgs: readFlagValues('--only'),
+  peers: readFlagValues('--peer'),
+};
+
+function matchesAnyNeedle(haystack: string, needles: string[]): boolean {
+  if (needles.length === 0) return true;
+  const h = haystack.toLowerCase();
+  return needles.some((n) => h.includes(n.toLowerCase()));
+}
 
 // -----------------------------
 // Setup
@@ -99,7 +137,7 @@ const nodeModulesPath = path.join(projectRoot, 'node_modules');
 const pkgCache = new Map<string, PackageJson>();
 
 // -----------------------------
-// Helpers
+// Shared helpers
 // -----------------------------
 
 function emptySummary(): Summary {
@@ -144,51 +182,40 @@ function readPackageJson(pkgJsonPath: string): PackageJson | null {
   return pkg;
 }
 
-/**
- * Walk node_modules and collect every installed package directory.
- * Uses realpath-based visited set to avoid re-walking same physical directories (pnpm symlinks).
- */
+function readPackageJsonIfExists(pkgJsonPath: string): PackageJson | null {
+  if (!fs.existsSync(pkgJsonPath)) return null;
+  return readPackageJson(pkgJsonPath);
+}
+
+// -----------------------------
+// node_modules walker (symlink-safe + refactored)
+// -----------------------------
+
 function collectPackages(startNodeModules: string): PackageInfo[] {
   const results: PackageInfo[] = [];
   const visitedDirs = new Set<string>();
 
   function walk(dir: string): void {
-    if (!fs.existsSync(dir)) return;
+    if (!canEnterDir(dir, visitedDirs)) return;
 
-    let real: string;
-    try {
-      real = fs.realpathSync(dir);
-    } catch {
-      return;
-    }
-    if (visitedDirs.has(real)) return;
-    visitedDirs.add(real);
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, ent.name);
+      if (!shouldConsiderEntry(ent, full)) continue;
 
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    for (const ent of entries) {
-      if (!ent.isDirectory()) continue;
-
-      const name = ent.name;
-      if (name.startsWith('.')) continue;
-
-      // scope folder
-      if (name.startsWith('@')) {
-        walk(path.join(dir, name));
+      // Scoped packages (@scope/*)
+      if (ent.name.startsWith('@')) {
+        walk(full);
         continue;
       }
 
-      const pkgDir = path.join(dir, name);
-      const pkgJsonPath = path.join(pkgDir, 'package.json');
-      if (!fs.existsSync(pkgJsonPath)) continue;
-
-      const pkg = readPackageJson(pkgJsonPath);
+      const pkgJsonPath = path.join(full, 'package.json');
+      const pkg = readPackageJsonIfExists(pkgJsonPath);
       if (!pkg) continue;
 
-      results.push({ pkg, dir: pkgDir });
+      results.push({ pkg, dir: full });
 
-      // nested node_modules (important for non-hoisted installs)
-      const nested = path.join(pkgDir, 'node_modules');
-      if (fs.existsSync(nested)) walk(nested);
+      const nested = path.join(full, 'node_modules');
+      walkIfExists(nested, walk);
     }
   }
 
@@ -196,8 +223,53 @@ function collectPackages(startNodeModules: string): PackageInfo[] {
   return results;
 }
 
+function canEnterDir(dir: string, visitedDirs: Set<string>): boolean {
+  if (!fs.existsSync(dir)) return false;
+
+  const real = tryRealpath(dir);
+  if (!real) return false;
+
+  if (visitedDirs.has(real)) return false;
+  visitedDirs.add(real);
+  return true;
+}
+
+function tryRealpath(dir: string): string | null {
+  try {
+    return fs.realpathSync(dir);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Skip dot entries and keep directories + symlinks-to-directories.
+ * pnpm packages under node_modules are commonly symlinks to a directory in the pnpm store.
+ */
+function shouldConsiderEntry(ent: fs.Dirent, fullPath: string): boolean {
+  if (ent.name.startsWith('.')) return false;
+  if (ent.isDirectory()) return true;
+  return ent.isSymbolicLink() && isSymlinkTargetDirectory(fullPath);
+}
+
+function isSymlinkTargetDirectory(fullPath: string): boolean {
+  try {
+    return fs.statSync(fullPath).isDirectory(); // follows symlink
+  } catch {
+    return false;
+  }
+}
+
+function walkIfExists(dir: string, walk: (d: string) => void): void {
+  if (fs.existsSync(dir)) walk(dir);
+}
+
+// -----------------------------
+// Peer resolution and validation
+// -----------------------------
+
 function peerPackageJsonPath(peerName: string): string {
-  // supports scoped peers
+  // supports scoped peers (@scope/name)
   const parts = peerName.split('/');
   return parts[0]?.startsWith('@')
     ? path.join('node_modules', parts[0], parts[1] ?? '', 'package.json')
@@ -205,7 +277,7 @@ function peerPackageJsonPath(peerName: string): string {
 }
 
 /**
- * Resolve a peer package version from the perspective of `fromDir`,
+ * Resolve a peer package from the perspective of `fromDir`,
  * walking up parent directories like Node does.
  */
 function resolvePeerFrom(fromDir: string, peerName: string, stopAt: string): { pkg: PackageJson; from: string } | null {
@@ -228,7 +300,6 @@ function resolvePeerFrom(fromDir: string, peerName: string, stopAt: string): { p
 }
 
 function validatePeerDependency(fromPkg: PackageInfo, peer: string, range: string): PeerCheckResult {
-  // handle non-semver ranges gracefully
   const validRange = semver.validRange(range, { includePrerelease: true });
   if (!validRange) {
     return {
@@ -245,8 +316,8 @@ function validatePeerDependency(fromPkg: PackageInfo, peer: string, range: strin
   }
 
   const installedVersion = resolved.pkg.version;
-
   const validVersion = semver.valid(installedVersion);
+
   if (!validVersion) {
     return {
       status: 'invalid-version',
@@ -267,12 +338,11 @@ function validatePeerDependency(fromPkg: PackageInfo, peer: string, range: strin
 }
 
 function formatFixSuggestion(peer: string, range: string): string {
-  // use workspace root install as the most common peer fix
   return `pnpm add -w ${peer}@"${range}"`;
 }
 
 // -----------------------------
-// Refactor: Variant A (dispatch table for non-satisfied results)
+// Variant A: dispatch table for non-satisfied results
 // -----------------------------
 
 interface IssueHandlerCtx {
@@ -351,12 +421,11 @@ function recordNonSatisfied(params: {
 
   const ctx: IssueHandlerCtx = { base, peer, range, perPkg, global, issues };
 
-  // dispatch (single branching point)
   (issueHandlers[result.status] as unknown as (c: IssueHandlerCtx, r: NonSatisfiedResult) => void)(ctx, result);
 }
 
 // -----------------------------
-// Refactor: Variant C (dispatch table for issue printing)
+// Variant C: dispatch table for issue printing
 // -----------------------------
 
 type PrintFn = (i: Issue) => void;
@@ -371,7 +440,7 @@ const issuePrinters: Record<Issue['status'], PrintFn> = {
 
   mismatched: (i) => {
     console.warn(
-      `⚠️ ${i.pkg}@${i.pkgVersion} peer mismatch: ${i.peer} installed ${i.installed} but requires ${i.range}`
+      `⚠️  ${i.pkg}@${i.pkgVersion} peer mismatch: ${i.peer} installed ${i.installed} but requires ${i.range}`
     );
     if (i.resolvedFrom) console.log(`   resolved from: ${i.resolvedFrom}`);
     if (i.suggestion) console.log(`   👉 Run: ${i.suggestion}`);
@@ -379,19 +448,18 @@ const issuePrinters: Record<Issue['status'], PrintFn> = {
   },
 
   'invalid-range': (i) => {
-    console.warn(`⚠️ ${i.pkg}@${i.pkgVersion} peer check skipped: ${i.peer} (${i.range})`);
+    console.warn(`⚠️  ${i.pkg}@${i.pkgVersion} peer check skipped: ${i.peer} (${i.range})`);
     if (i.reason) console.log(`   reason: ${i.reason}`);
     console.log('');
   },
 
   'invalid-version': (i) => {
-    console.warn(`⚠️ ${i.pkg}@${i.pkgVersion} peer check skipped: ${i.peer} (${i.range})`);
+    console.warn(`⚠️  ${i.pkg}@${i.pkgVersion} peer check skipped: ${i.peer} (${i.range})`);
     if (i.reason) console.log(`   reason: ${i.reason}`);
     console.log('');
   },
 
-  // This should never be called because we only print issues (non-satisfied),
-  // but must exist to satisfy Record<Issue['status'], PrintFn>
+  // Not expected to be called (we only print issues), but required for Record completeness.
   satisfied: (i) => {
     if (!QUIET) console.log(`✅ ${i.pkg} peer satisfied: ${i.peer} (${i.range})`);
   },
@@ -405,12 +473,19 @@ function printIssue(i: Issue): void {
 // Reporting
 // -----------------------------
 
+function printFilterHeader(): void {
+  const only = filters.onlyPkgs.length ? filters.onlyPkgs.join(', ') : '(none)';
+  const peer = filters.peers.length ? filters.peers.join(', ') : '(none)';
+  console.log(`\n🔧 Filters: --only=[${only}] --peer=[${peer}]`);
+}
+
 function printJsonReport(summary: Summary, perPackage: Record<string, Summary>, issues: Issue[]): void {
   console.log(
     JSON.stringify(
       {
         projectRoot,
         nodeModulesPath,
+        filters,
         summary,
         perPackage,
         issues,
@@ -422,6 +497,8 @@ function printJsonReport(summary: Summary, perPackage: Record<string, Summary>, 
 }
 
 function printTextReport(summary: Summary, perPackage: Record<string, Summary>, issues: Issue[]): void {
+  printFilterHeader();
+
   if (issues.length) {
     console.log('\n⚠️ Peer dependency issues found:\n');
     for (const i of issues) printIssue(i);
@@ -434,7 +511,6 @@ function printTextReport(summary: Summary, perPackage: Record<string, Summary>, 
   console.log('   🟦 Invalid ranges:', summary.invalidRange);
   console.log('   🟪 Invalid vers. :', summary.invalidVersion);
 
-  // print only packages with issues, sorted by total issues desc
   const entries = Object.entries(perPackage)
     .map(([name, s]) => ({ name, ...s, issues: s.mismatched + s.missing + s.invalidRange + s.invalidVersion }))
     .filter((x) => x.issues > 0)
@@ -473,6 +549,14 @@ function exitWithStatus(issues: Issue[]): never {
 // Run
 // -----------------------------
 
+function shouldCheckPackage(pkgName: string): boolean {
+  return matchesAnyNeedle(pkgName, filters.onlyPkgs);
+}
+
+function shouldCheckPeer(peerName: string): boolean {
+  return matchesAnyNeedle(peerName, filters.peers);
+}
+
 function run(): void {
   ensureNodeModulesOrExit();
 
@@ -483,18 +567,21 @@ function run(): void {
   const issues: Issue[] = [];
 
   for (const info of packages) {
+    if (!shouldCheckPackage(info.pkg.name)) continue;
+
     const peers = info.pkg.peerDependencies;
     if (!peers) continue;
 
     const perPkgSummary = getPerPackageSummary(perPackage, info.pkg.name);
 
     for (const [peer, range] of Object.entries(peers)) {
+      if (!shouldCheckPeer(peer)) continue;
+
       const result = validatePeerDependency(info, peer, range);
 
       if (result.status === 'satisfied') {
         summary.satisfied++;
         perPkgSummary.satisfied++;
-
         if (!QUIET) {
           console.log(`✅ ${info.pkg.name} -> ${peer}@${result.version} satisfies ${result.range}`);
         }
