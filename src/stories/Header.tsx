@@ -1,4 +1,4 @@
-import { Button } from './button';
+import { Button } from './Button';
 import './header.css';
 
 interface User {
@@ -38,7 +38,7 @@ export const Header = ({ user, onLogin, onLogout, onCreateAccount }: HeaderProps
         ) : (
           <>
             <Button type="button" size="sm" onClick={onLogin}>
-              "Log in"
+              Log in
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={onCreateAccount}>
               Sign up

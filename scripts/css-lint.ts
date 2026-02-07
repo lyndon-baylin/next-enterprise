@@ -1,8 +1,8 @@
 // scripts/checks.ts
 
-import chalk from 'chalk';
-
 import { execSync } from 'node:child_process';
+
+import chalk from 'chalk';
 
 /**
  * Runs a check command and logs success or failure messages.

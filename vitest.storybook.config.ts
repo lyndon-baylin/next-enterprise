@@ -1,7 +1,8 @@
 // vitest.storybook.config.ts
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { defineConfig } from 'vitest/config';
 
 const isDirnameDefined = typeof __dirname !== 'undefined';
