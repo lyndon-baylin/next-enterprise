@@ -32,6 +32,7 @@ interface PackageJson {
   name: string;
   version: string;
   peerDependencies?: Record<string, string>;
+  peerDependenciesMeta?: Record<string, { optional?: boolean }>;
 }
 
 interface PackageInfo {
@@ -81,9 +82,10 @@ interface Filters {
 const argv = process.argv.slice(2);
 const args = new Set(argv);
 
+const IS_CI = process.env.CI === 'true';
 const QUIET = args.has('--quiet');
 const JSON_OUT = args.has('--json');
-const STRICT = args.has('--strict') || process.env.CI === 'true';
+const STRICT = args.has('--strict');
 
 function readFlagValues(flag: string): string[] {
   const out: string[] = [];
@@ -176,6 +178,7 @@ function readPackageJson(pkgJsonPath: string): PackageJson | null {
     name: obj.name,
     version: obj.version,
     peerDependencies: obj.peerDependencies ?? undefined,
+    peerDependenciesMeta: obj.peerDependenciesMeta ?? undefined,
   };
 
   pkgCache.set(pkgJsonPath, pkg);
@@ -204,7 +207,17 @@ function collectPackages(startNodeModules: string): PackageInfo[] {
 
       // Scoped packages (@scope/*)
       if (ent.name.startsWith('@')) {
-        walk(full);
+        // Some pnpm layouts can present a scoped package as a symlinked dir
+        // rather than a scope folder. If it has a package.json, treat it as a package.
+        const scopedPkgJson = path.join(full, 'package.json');
+        const scopedPkg = readPackageJsonIfExists(scopedPkgJson);
+        if (scopedPkg) {
+          results.push({ pkg: scopedPkg, dir: full });
+          const nested = path.join(full, 'node_modules');
+          walkIfExists(nested, walk);
+        } else {
+          walk(full);
+        }
         continue;
       }
 
@@ -280,8 +293,9 @@ function peerPackageJsonPath(peerName: string): string {
  * Resolve a peer package from the perspective of `fromDir`,
  * walking up parent directories like Node does.
  */
-function resolvePeerFrom(fromDir: string, peerName: string, stopAt: string): { pkg: PackageJson; from: string } | null {
+function resolvePeerFrom(fromDir: string, peerName: string): { pkg: PackageJson; from: string } | null {
   let current = fromDir;
+  const fsRoot = path.parse(current).root;
 
   while (true) {
     const candidate = path.join(current, peerPackageJsonPath(peerName));
@@ -290,7 +304,7 @@ function resolvePeerFrom(fromDir: string, peerName: string, stopAt: string): { p
       if (pkg) return { pkg, from: path.dirname(candidate) };
     }
 
-    if (current === stopAt) break;
+    if (current === fsRoot) break;
     const parent = path.dirname(current);
     if (parent === current) break;
     current = parent;
@@ -310,7 +324,7 @@ function validatePeerDependency(fromPkg: PackageInfo, peer: string, range: strin
     };
   }
 
-  const resolved = resolvePeerFrom(fromPkg.dir, peer, projectRoot);
+  const resolved = resolvePeerFrom(fromPkg.dir, peer);
   if (!resolved) {
     return { status: 'missing', peer, range, searchedFrom: fromPkg.dir };
   }
@@ -533,8 +547,20 @@ function isBlockingStatus(status: Issue['status']): boolean {
 }
 
 function exitWithStatus(issues: Issue[]): never {
+  const hasAnyIssues = issues.length > 0;
   const hasBlockingIssues = issues.some((i) => isBlockingStatus(i.status));
 
+  // CI is conservative: any issue fails (including invalid-range/version)
+  if (IS_CI) {
+    if (!hasAnyIssues) {
+      if (!JSON_OUT) console.log('\n🎉 All peer dependencies are satisfied!');
+      process.exit(0);
+    }
+    if (!JSON_OUT) console.error('\n🚨 CI mode: failing due to peer dependency issues (including warnings).');
+    process.exit(1);
+  }
+
+  // Local strict: only fail on blocking issues
   if (!hasBlockingIssues) {
     if (!JSON_OUT) console.log('\n🎉 All peer dependencies are satisfied (or only non-blocking warnings were found)!');
     process.exit(0);
@@ -576,9 +602,11 @@ function run(): void {
     if (!peers) continue;
 
     const perPkgSummary = getPerPackageSummary(perPackage, info.pkg.name);
+    const peersMeta = info.pkg.peerDependenciesMeta ?? {};
 
     for (const [peer, range] of Object.entries(peers)) {
       if (!shouldCheckPeer(peer)) continue;
+      if (peersMeta[peer]?.optional) continue;
 
       const result = validatePeerDependency(info, peer, range);
 
