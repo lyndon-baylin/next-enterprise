@@ -1,77 +1,112 @@
+import fs from 'node:fs';
+
 import eslintPluginNext from '@next/eslint-plugin-next';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginImport from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettier from 'eslint-plugin-prettier';
-import eslintPluginStorybook from 'eslint-plugin-storybook';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import { configs as storybookConfigs } from 'eslint-plugin-storybook';
 import unusedImports from 'eslint-plugin-unused-imports';
-import tseslint from 'typescript-eslint';
+import { configs as tsConfigs } from 'typescript-eslint';
 
-import fs from 'node:fs';
+const repoRoot = import.meta.dirname;
 
-function getDirectoriesToSort() {
-  const ignoredSortingDirectories = new Set(['.git', '.next', '.vscode', 'node_modules']);
-  return fs
-    .readdirSync(process.cwd())
-    .filter((file) => fs.statSync(process.cwd() + '/' + file).isDirectory())
-    .filter((f) => !ignoredSortingDirectories.has(f));
+function getDirectoriesToSort(rootDir) {
+  const ignored = new Set(['.git', '.next', '.vscode', 'node_modules', 'dist', 'out', 'build', 'coverage', 'html']);
+
+  try {
+    return fs
+      .readdirSync(rootDir, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name)
+      .filter((name) => !ignored.has(name));
+  } catch {
+    // Don’t let config-load-time FS issues break ESLint in editors/CI
+    return [];
+  }
 }
 
 const eslintIgnore = [
   '.git/**',
   '.next/**',
-  '.next/types/**',
-  '.next/dev/types/**',
   'node_modules/**',
   'dist/**',
   'out/**',
   'build/**',
   'coverage/**',
   'html/**',
-  '*.min.js',
-  '*.config.js',
-  '*.config.ts',
-  '*.config.mjs',
-  '*.d.ts',
-  'tsconfig*.json',
+
+  '**/*.min.js',
+  '**/*.d.ts',
 ];
 
 const eslintConfig = [
+  { ignores: eslintIgnore },
+
+  // Storybook
+  ...storybookConfigs['flat/recommended'],
+
+  // TypeScript (type-aware)
+  ...tsConfigs.recommended,
+  ...tsConfigs.strictTypeChecked,
+  ...tsConfigs.stylisticTypeChecked,
+
+  // Import plugin
+  eslintPluginImport.flatConfigs.recommended,
+  eslintPluginImport.flatConfigs.typescript,
+
+  // Catch unused eslint-disable comments
   {
-    ignores: eslintIgnore,
+    linterOptions: {
+      reportUnusedDisableDirectives: 'error',
+    },
   },
 
-  // Storybook, Import, NextJS
-  ...eslintPluginStorybook.configs['flat/recommended'],
-
-  // ✅ Base + strict + stylistic configs
-  ...tseslint.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
-
-  eslintPluginImport.flatConfigs.recommended,
-
+  // Main ruleset
   {
     files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json', './tsconfig.storybook.json'], // enable type-aware linting
-        tsconfigRootDir: import.meta.dirname,
+        project: ['./tsconfig.json'],
+        tsconfigRootDir: repoRoot,
         ecmaFeatures: { jsx: true },
       },
     },
     plugins: {
       '@next/next': eslintPluginNext,
       'jsx-a11y': jsxA11y,
-      prettier: prettier,
+      prettier,
       'unused-imports': unusedImports,
+
+      // ✅ React + Hooks
+      react,
+      'react-hooks': reactHooks,
+    },
+    settings: {
+      react: { version: 'detect' },
     },
     rules: {
+      // Next + a11y
       ...eslintPluginNext.configs.recommended.rules,
       ...eslintPluginNext.configs['core-web-vitals'].rules,
       ...jsxA11y.configs.recommended.rules,
 
-      // 🔥 unused imports cleanup
+      // React + Hooks recommended
+      ...react.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+
+      // ✅ Strict braces for all control statements (app + config + scripts)
+      curly: ['error', 'all'],
+
+      // Next.js / modern JSX transform
+      'react/react-in-jsx-scope': 'off',
+
+      // TS replaces prop-types
+      'react/prop-types': 'off',
+
+      // Unused imports cleanup
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error',
@@ -84,59 +119,81 @@ const eslintConfig = [
           argsIgnorePattern: '^_',
         },
       ],
-      // 🎨 Prettier integration
+
+      // enforce interfaces for object shapes
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+
+      // Prettier integration
       'prettier/prettier': 'error',
     },
   },
 
+  // Settings + import sorting
   {
     settings: {
-      tailwindcss: {
-        callees: ['classnames', 'clsx', 'ctl', 'cn', 'cva'],
-      },
+      // If you're not using eslint-plugin-tailwindcss, this is harmless but optional.
+      // Note: Enable this line once a v4 support of `eslint-plugin-tailwindcss` reaches stable version
+      // tailwindcss: {
+      //   callees: ['classnames', 'clsx', 'ctl', 'cn', 'cva'],
+      // },
 
       'import/resolver': {
-        typescript: true,
+        // Requires: eslint-import-resolver-typescript
+        typescript: {
+          project: ['./tsconfig.json'],
+          alwaysTryTypes: true,
+        },
         node: {
-          extensions: ['.js', '.ts', '.tsx'],
+          extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'],
           moduleDirectory: ['node_modules', 'src'],
         },
       },
-      // This tells ESLint to treat these fonts as “core modules” (no resolution needed).
+
+      // Treat these as “core modules” (no resolution needed)
       'import/core-modules': ['geist/font/sans', 'geist/font/mono'],
     },
     rules: {
-      'sort-imports': ['error', { ignoreCase: true, ignoreDeclarationSort: true }],
+      // Let import/order handle declaration grouping; keep member sorting.
+      'sort-imports': [
+        'error',
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+          memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
+        },
+      ],
 
+      // ✅ Ideal order for Next + TS + @/* alias:
+      // builtin -> external -> internal (@/...) -> parent -> sibling -> index -> css last
       'import/order': [
         'warn',
         {
-          groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           pathGroups: [
-            ...getDirectoriesToSort().map((dir) => ({
+            // Your TS alias
+            { pattern: '@/**', group: 'internal', position: 'after' },
+
+            // Keep if you import these directly as modules
+            { pattern: 'env', group: 'internal', position: 'after' },
+            { pattern: 'theme', group: 'internal', position: 'after' },
+
+            // Treat repo-root folders as internal (safe + anchored)
+            ...getDirectoriesToSort(repoRoot).map((dir) => ({
               pattern: `${dir}/**`,
               group: 'internal',
+              position: 'after',
             })),
-            {
-              pattern: 'env',
-              group: 'internal',
-            },
-            {
-              pattern: 'theme',
-              group: 'internal',
-            },
-            {
-              pattern: 'public/**',
-              group: 'internal',
-              position: 'after',
-            },
-            {
-              pattern: '**/*.css',
-              group: 'index',
-              position: 'after',
-            },
+
+            { pattern: 'public/**', group: 'internal', position: 'after' },
+
+            // Styles last
+            { pattern: '**/*.css', group: 'index', position: 'after' },
           ],
-          pathGroupsExcludedImportTypes: ['internal'],
+
+          // Don’t exclude internal; it defeats your internal pathGroups.
+          pathGroupsExcludedImportTypes: ['builtin'],
+
           'newlines-between': 'always',
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
@@ -144,25 +201,62 @@ const eslintConfig = [
     },
   },
 
-  // 🚨 Override: turn off type-aware "unsafe" rules for config files
-  // This ensures that
-  // - ESLint won't try to load `tsconfig.json` for non-typescript config file
-  // - Type-aware rules like `await-thenable` are disabled where they don't apply.
+  // ✅ Storybook should be type-aware (you enabled strictTypeChecked globally)
   {
-    files: ['*.config.{js,cjs,mjs,ts}', 'eslint.config.{js,mjs,cjs,ts}', 'tsconfig*.json'],
+    files: ['.storybook/**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       parserOptions: {
-        project: null, // ⛔ disables type-aware linting
+        project: ['./tsconfig.storybook.json'],
+        tsconfigRootDir: repoRoot,
       },
-    },
-    rules: {
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/await-thenable': 'off', // ✅ turn off type-aware rule
     },
   },
 
-  // 🧹 Prettier conflict resolver
+  // Override: config files shouldn’t be type-aware
+  {
+    files: [
+      '**/*.config.{js,cjs,mjs,ts}',
+      'commitlint.config.{js,cjs,mjs,ts}',
+      '**/eslint.config.{js,mjs,cjs,ts}',
+      '**/vitest.config.{js,cjs,mjs,ts}',
+      '**/vitest.*.config.{js,cjs,mjs,ts}',
+      'scripts/**/*.{js,ts,mjs,cjs}',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: null, // ⛔ disables type-aware linting for these
+      },
+    },
+    rules: {
+      // ✅ turn off type-aware TS rules in non-type-aware files
+      ...tsConfigs.disableTypeChecked.rules,
+
+      // --- Tiny, pragmatic relaxations for tooling code ---
+      'no-console': 'off', // configs/scripts often log intentionally
+      '@typescript-eslint/no-require-imports': 'off', // some tooling still uses require()
+
+      // If you use eslint-plugin-import rule `import/no-default-export`, config files often default export
+      // (Only matters if you enable that rule elsewhere)
+      'import/no-default-export': 'off',
+    },
+  },
+
+  // ✅ Override: tests can be a bit looser without weakening app code
+  {
+    files: [
+      '**/*.{test,spec}.{js,jsx,ts,tsx}',
+      '**/__tests__/**/*.{js,jsx,ts,tsx}',
+      '**/test/**/*.{js,jsx,ts,tsx}',
+      '**/tests/**/*.{js,jsx,ts,tsx}',
+      '**/*.stories.{js,jsx,ts,tsx}',
+    ],
+    rules: {
+      // Often too noisy in tests where effects are mocked or deps are intentional
+      'react-hooks/exhaustive-deps': 'warn',
+    },
+  },
+
+  // Prettier conflict resolver must be last
   eslintConfigPrettier,
 ];
 
