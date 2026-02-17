@@ -59,7 +59,7 @@
             ],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true,
-            "requiredStatusChecks": ["Renovate CI"]
+            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
         },
         {
             "groupName": "testing & QA",
@@ -73,14 +73,14 @@
             ],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true,
-            "requiredStatusChecks": ["Renovate CI"]
+            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
         },
         {
             "groupName": "storybook ecosystem",
             "matchPackageNames": ["/^storybook$/", "/^@storybook\\//", "/^@chromatic-com\\/storybook$/"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true,
-            "requiredStatusChecks": ["Renovate CI"]
+            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
         },
         {
             "groupName": "tailwind ecosystem",
@@ -93,14 +93,14 @@
             ],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true,
-            "requiredStatusChecks": ["Renovate CI"]
+            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
         },
         {
             "description": "Default: automerge devDependencies minor/patch",
             "matchDepTypes": ["devDependencies"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true,
-            "requiredStatusChecks": ["Renovate CI"]
+            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
         },
         {
             "groupName": "native/build-script dependencies (pnpm onlyBuiltDependencies)",
