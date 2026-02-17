@@ -20,7 +20,7 @@
         "check:bundle-sizes": "tsx scripts/check-bundle-sizes.ts",
         "check:peers": "tsx scripts/check-peers.ts",
         "setup": "pnpm install --frozen-lockfile",
-        "test": "cross-env FORCE_COLOR=1 vitest",
+        "test": "cross-env FORCE_COLOR=1 vitest --run",
         "test:watch": "cross-env FORCE_COLOR=1 vitest --watch",
         "test:ui": "cross-env FORCE_COLOR=1 vitest --ui",
         "test:coverage": "cross-env FORCE_COLOR=1 vitest --coverage",
