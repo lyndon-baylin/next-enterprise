@@ -1,6 +1,5 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-
     "extends": [
         "config:recommended",
         ":dependencyDashboard",
@@ -8,39 +7,32 @@
         ":prConcurrentLimit10",
         ":prHourlyLimit2"
     ],
-
     "labels": ["dependencies"],
     "assignees": ["lyndon-baylin"],
     "timezone": "Asia/Manila",
-
     "schedule": ["on the 17th day of the month after 1am and before 4am"],
     "rangeStrategy": "bump",
-
     "vulnerabilityAlerts": { "enabled": true },
     "osvVulnerabilityAlerts": true,
-
     "automergeType": "pr",
     "platformAutomerge": true,
-
     "rebaseWhen": "behind-base-branch",
     "minimumReleaseAge": "3 days",
-
     "lockFileMaintenance": {
         "enabled": true,
         "schedule": ["on the 17th day of the month before 3am"],
         "dependencyDashboardApproval": true,
         "labels": ["lockfile-maintenance"]
     },
-
     "packageRules": [
         {
             "description": "Security fixes should not wait for monthly window (still manual merge)",
             "matchCategories": ["security"],
             "schedule": ["at any time"],
             "labels": ["security"],
-            "automerge": false
+            "automerge": false,
+            "dependencyDashboardApproval": true
         },
-
         {
             "description": "All major updates are gated",
             "matchUpdateTypes": ["major"],
@@ -49,14 +41,67 @@
             "prConcurrentLimit": 1,
             "automerge": false
         },
-
         {
             "description": "Never automerge runtime dependencies in a Next.js app",
             "matchDepTypes": ["dependencies", "optionalDependencies", "peerDependencies"],
             "matchUpdateTypes": ["minor", "patch"],
-            "automerge": false
+            "automerge": false,
+            "dependencyDashboardApproval": true
         },
-
+        {
+            "groupName": "lint & formatting",
+            "matchPackageNames": [
+                "/^eslint($|[-/])/",
+                "/eslint-config-/",
+                "/eslint-plugin-/",
+                "/^prettier($|[-/])/",
+                "/^stylelint($|[-/])/"
+            ],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "requiredStatusChecks": ["Renovate CI"]
+        },
+        {
+            "groupName": "testing & QA",
+            "matchPackageNames": [
+                "/^vitest($|[-/])/",
+                "/^@vitest\\//",
+                "/^@playwright\\//",
+                "/^playwright$/",
+                "/^@testing-library\\//",
+                "/^jsdom$/"
+            ],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "requiredStatusChecks": ["Renovate CI"]
+        },
+        {
+            "groupName": "storybook ecosystem",
+            "matchPackageNames": ["/^storybook$/", "/^@storybook\\//", "/^@chromatic-com\\/storybook$/"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "requiredStatusChecks": ["Renovate CI"]
+        },
+        {
+            "groupName": "tailwind ecosystem",
+            "matchPackageNames": [
+                "/^tailwindcss$/",
+                "/^@tailwindcss\\//",
+                "/tailwind-merge/",
+                "/prettier-plugin-tailwindcss/",
+                "/tw-animate/"
+            ],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "requiredStatusChecks": ["Renovate CI"]
+        },
+        {
+            "description": "Default: automerge devDependencies minor/patch",
+            "matchDepTypes": ["devDependencies"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "requiredStatusChecks": ["Renovate CI"]
+        },
         {
             "groupName": "native/build-script dependencies (pnpm onlyBuiltDependencies)",
             "matchPackageNames": [
@@ -73,7 +118,6 @@
             "automerge": false,
             "schedule": ["at any time"]
         },
-
         {
             "description": "patch-package updates can invalidate patches",
             "matchPackageNames": ["patch-package"],
@@ -81,65 +125,26 @@
             "dependencyDashboardApproval": true,
             "automerge": false
         },
-
-        {
-            "groupName": "lint & formatting",
-            "matchPackageNames": [
-                "/^eslint($|[-/])/",
-                "/eslint-config-/",
-                "/eslint-plugin-/",
-                "/^prettier($|[-/])/",
-                "/^stylelint($|[-/])/"
-            ],
-            "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true
-        },
-
-        {
-            "groupName": "testing & QA",
-            "matchPackageNames": [
-                "/^vitest($|[-/])/",
-                "/^@vitest\\//",
-                "/^@playwright\\//",
-                "/^playwright$/",
-                "/^@testing-library\\//",
-                "/^jsdom$/"
-            ],
-            "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true
-        },
-
-        {
-            "groupName": "storybook ecosystem",
-            "matchPackageNames": ["/^storybook$/", "/^@storybook\\//", "/^@chromatic-com\\/storybook$/"],
-            "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true
-        },
-
-        {
-            "groupName": "tailwind ecosystem",
-            "matchPackageNames": [
-                "/^tailwindcss$/",
-                "/^@tailwindcss\\//",
-                "/tailwind-merge/",
-                "/prettier-plugin-tailwindcss/",
-                "/tw-animate/"
-            ],
-            "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true
-        },
-
-        {
-            "description": "Default: automerge devDependencies minor/patch",
-            "matchDepTypes": ["devDependencies"],
-            "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true
-        },
-
         {
             "description": "Core framework updates are always manual",
             "matchPackageNames": ["next", "react", "react-dom", "typescript"],
             "matchUpdateTypes": ["minor", "patch", "major"],
+            "automerge": false,
+            "dependencyDashboardApproval": true,
+            "labels": ["needs-review"]
+        },
+        {
+            "description": "Hard stop: never automerge high-risk install/build deps",
+            "matchPackageNames": [
+                "patch-package",
+                "postinstall-postinstall",
+                "esbuild",
+                "sharp",
+                "@swc/core",
+                "@tailwindcss/oxide",
+                "unrs-resolver",
+                "core-js-pure"
+            ],
             "automerge": false,
             "dependencyDashboardApproval": true,
             "labels": ["needs-review"]
