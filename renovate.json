@@ -6,19 +6,24 @@
         ":dependencyDashboard",
         ":semanticCommits",
         ":prConcurrentLimit10",
-        ":prHourlyLimit2",
-        ":automergeBranch",
-        ":automergeMinor"
+        ":prHourlyLimit2"
     ],
 
-    "vulnerabilityAlerts": { "enabled": true },
-    "osvVulnerabilityAlerts": true,
-
     "labels": ["dependencies"],
+    "assignees": ["lyndon-baylin"],
     "timezone": "Asia/Manila",
 
     "schedule": ["on the 17th day of the month after 1am and before 4am"],
     "rangeStrategy": "bump",
+
+    "vulnerabilityAlerts": { "enabled": true },
+    "osvVulnerabilityAlerts": true,
+
+    "automergeType": "pr",
+    "platformAutomerge": true,
+
+    "rebaseWhen": "behind-base-branch",
+    "minimumReleaseAge": "3 days",
 
     "lockFileMaintenance": {
         "enabled": true,
@@ -29,70 +34,115 @@
 
     "packageRules": [
         {
-            "groupName": "lint & formatting",
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
-            "matchPackageNames": ["/eslint/", "/lint/", "/prettier/", "/stylelint/"],
-            "automerge": true
-        },
-        {
-            "groupName": "typescript core (minor & patch)",
-            "matchPackageNames": ["typescript"],
-            "matchUpdateTypes": ["minor", "patch"],
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
+            "description": "Security fixes should not wait for monthly window (still manual merge)",
+            "matchCategories": ["security"],
+            "schedule": ["at any time"],
+            "labels": ["security"],
             "automerge": false
         },
+
         {
-            "groupName": "typescript core (major upgrades)",
-            "matchPackageNames": ["typescript"],
+            "description": "All major updates are gated",
             "matchUpdateTypes": ["major"],
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
             "labels": ["major-upgrade"],
             "dependencyDashboardApproval": true,
             "prConcurrentLimit": 1,
             "automerge": false
         },
+
         {
-            "groupName": "typescript tooling",
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
-            "matchPackageNames": ["/ts-node/", "/ts-jest/"],
+            "description": "Never automerge runtime dependencies in a Next.js app",
+            "matchDepTypes": ["dependencies", "optionalDependencies", "peerDependencies"],
+            "matchUpdateTypes": ["minor", "patch"],
             "automerge": false
         },
+
+        {
+            "groupName": "native/build-script dependencies (pnpm onlyBuiltDependencies)",
+            "matchPackageNames": [
+                "@swc/core",
+                "@tailwindcss/oxide",
+                "core-js-pure",
+                "esbuild",
+                "sharp",
+                "unrs-resolver",
+                "postinstall-postinstall"
+            ],
+            "labels": ["native-build", "needs-review"],
+            "dependencyDashboardApproval": true,
+            "automerge": false,
+            "schedule": ["at any time"]
+        },
+
+        {
+            "description": "patch-package updates can invalidate patches",
+            "matchPackageNames": ["patch-package"],
+            "labels": ["needs-review"],
+            "dependencyDashboardApproval": true,
+            "automerge": false
+        },
+
+        {
+            "groupName": "lint & formatting",
+            "matchPackageNames": [
+                "/^eslint($|[-/])/",
+                "/eslint-config-/",
+                "/eslint-plugin-/",
+                "/^prettier($|[-/])/",
+                "/^stylelint($|[-/])/"
+            ],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true
+        },
+
         {
             "groupName": "testing & QA",
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
-            "matchPackageNames": ["/jest/", "/vitest/", "/playwright/", "/cypress/", "/@testing-library//"],
+            "matchPackageNames": [
+                "/^vitest($|[-/])/",
+                "/^@vitest\\//",
+                "/^@playwright\\//",
+                "/^playwright$/",
+                "/^@testing-library\\//",
+                "/^jsdom$/"
+            ],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true
         },
+
         {
             "groupName": "storybook ecosystem",
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
-            "matchPackageNames": ["/^storybook/", "/@storybook//"],
+            "matchPackageNames": ["/^storybook$/", "/^@storybook\\//", "/^@chromatic-com\\/storybook$/"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true
         },
+
         {
-            "groupName": "react & next.js core (minor & patch)",
-            "matchPackageNames": ["/^react/", "/^react-dom/", "/^next/"],
+            "groupName": "tailwind ecosystem",
+            "matchPackageNames": [
+                "/^tailwindcss$/",
+                "/^@tailwindcss\\//",
+                "/tailwind-merge/",
+                "/prettier-plugin-tailwindcss/",
+                "/tw-animate/"
+            ],
             "matchUpdateTypes": ["minor", "patch"],
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
-            "automerge": false
+            "automerge": true
         },
+
         {
-            "groupName": "react & next.js core (major upgrades)",
-            "matchPackageNames": ["/^react/", "/^react-dom/", "/^next/"],
-            "matchUpdateTypes": ["major"],
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
-            "labels": ["major-upgrade"],
-            "dependencyDashboardApproval": true,
-            "prConcurrentLimit": 1,
-            "automerge": false
-        },
-        {
+            "description": "Default: automerge devDependencies minor/patch",
             "matchDepTypes": ["devDependencies"],
-            "schedule": ["on the 17th day of the month after 1am and before 4am"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true
+        },
+
+        {
+            "description": "Core framework updates are always manual",
+            "matchPackageNames": ["next", "react", "react-dom", "typescript"],
+            "matchUpdateTypes": ["minor", "patch", "major"],
+            "automerge": false,
+            "dependencyDashboardApproval": true,
+            "labels": ["needs-review"]
         }
     ]
 }

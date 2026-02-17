@@ -1,0 +1,36 @@
+name: Renovate CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.actor == 'renovate[bot]' || github.actor == 'renovate'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Enable Corepack (uses packageManager from package.json)
+        run: corepack enable
+
+      - name: Install (runs postinstall + onlyBuiltDependencies rules)
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
