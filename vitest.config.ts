@@ -6,7 +6,13 @@ import { defineConfig } from 'vitest/config';
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
-  plugins: [tsconfigPaths(), react()],
+  plugins: [
+    tsconfigPaths({
+      projectDiscovery: 'lazy',
+      logFile: true,
+    }),
+    react(),
+  ],
   test: {
     reporters: ['default', 'html'],
     environment: 'jsdom',
