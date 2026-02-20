@@ -10,6 +10,6 @@ export const env = createEnv({
   },
   client: {},
   runtimeEnv: {
-    ANALYZE: process.env.ANALYZE,
+    ANALYZE: true,
   },
 });

@@ -1,6 +1,10 @@
+/* eslint-disable import/no-named-as-default-member */
+// eslint.config.mjs
 import fs from 'node:fs';
 
+import eslint from '@eslint/js';
 import eslintPluginNext from '@next/eslint-plugin-next';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginImport from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
@@ -9,7 +13,7 @@ import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import { configs as storybookConfigs } from 'eslint-plugin-storybook';
 import unusedImports from 'eslint-plugin-unused-imports';
-import { configs as tsConfigs } from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
 const repoRoot = import.meta.dirname;
 
@@ -42,16 +46,21 @@ const eslintIgnore = [
   '**/*.d.ts',
 ];
 
-const eslintConfig = [
-  { ignores: eslintIgnore },
+export default defineConfig(
+  // ESLint v10: flat config only; .eslintignore is not used.
+  // globalIgnores() makes "global ignores" explicit.
+  globalIgnores(eslintIgnore),
+
+  // Base JS rules (equivalent of eslint:recommended, but for flat config)
+  eslint.configs.recommended,
 
   // Storybook
   ...storybookConfigs['flat/recommended'],
 
   // TypeScript (type-aware)
-  ...tsConfigs.recommended,
-  ...tsConfigs.strictTypeChecked,
-  ...tsConfigs.stylisticTypeChecked,
+  ...tseslint.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
 
   // Import plugin
   eslintPluginImport.flatConfigs.recommended,
@@ -75,12 +84,14 @@ const eslintConfig = [
       },
     },
     plugins: {
+      // Keep this key to match the rule names coming from eslintPluginNext.configs.*,
+      // which are prefixed with "@next/next/..."
       '@next/next': eslintPluginNext,
       'jsx-a11y': jsxA11y,
       prettier,
       'unused-imports': unusedImports,
 
-      // ✅ React + Hooks
+      // React + Hooks
       react,
       'react-hooks': reactHooks,
     },
@@ -97,7 +108,7 @@ const eslintConfig = [
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
 
-      // ✅ Strict braces for all control statements (app + config + scripts)
+      // Strict braces for all control statements (app + config + scripts)
       curly: ['error', 'all'],
 
       // Next.js / modern JSX transform
@@ -120,7 +131,7 @@ const eslintConfig = [
         },
       ],
 
-      // enforce interfaces for object shapes
+      // Enforce interfaces for object shapes
       '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
 
       // Prettier integration
@@ -128,15 +139,9 @@ const eslintConfig = [
     },
   },
 
-  // Settings + import sorting
+  // Settings + import sorting (applies globally)
   {
     settings: {
-      // If you're not using eslint-plugin-tailwindcss, this is harmless but optional.
-      // Note: Enable this line once a v4 support of `eslint-plugin-tailwindcss` reaches stable version
-      // tailwindcss: {
-      //   callees: ['classnames', 'clsx', 'ctl', 'cn', 'cva'],
-      // },
-
       'import/resolver': {
         // Requires: eslint-import-resolver-typescript
         typescript: {
@@ -164,21 +169,17 @@ const eslintConfig = [
         },
       ],
 
-      // ✅ Ideal order for Next + TS + @/* alias:
-      // builtin -> external -> internal (@/...) -> parent -> sibling -> index -> css last
+      // builtin -> external -> internal -> parent -> sibling -> index
       'import/order': [
         'warn',
         {
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           pathGroups: [
-            // Your TS alias
             { pattern: '@/**', group: 'internal', position: 'after' },
 
-            // Keep if you import these directly as modules
             { pattern: 'env', group: 'internal', position: 'after' },
             { pattern: 'theme', group: 'internal', position: 'after' },
 
-            // Treat repo-root folders as internal (safe + anchored)
             ...getDirectoriesToSort(repoRoot).map((dir) => ({
               pattern: `${dir}/**`,
               group: 'internal',
@@ -190,10 +191,7 @@ const eslintConfig = [
             // Styles last
             { pattern: '**/*.css', group: 'index', position: 'after' },
           ],
-
-          // Don’t exclude internal; it defeats your internal pathGroups.
           pathGroupsExcludedImportTypes: ['builtin'],
-
           'newlines-between': 'always',
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
@@ -201,7 +199,7 @@ const eslintConfig = [
     },
   },
 
-  // ✅ Storybook should be type-aware (you enabled strictTypeChecked globally)
+  // Storybook should be type-aware
   {
     files: ['.storybook/**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
@@ -212,7 +210,7 @@ const eslintConfig = [
     },
   },
 
-  // Override: config files shouldn’t be type-aware
+  // Config/tooling files shouldn’t be type-aware
   {
     files: [
       '**/*.config.{js,cjs,mjs,ts}',
@@ -224,24 +222,20 @@ const eslintConfig = [
     ],
     languageOptions: {
       parserOptions: {
-        project: null, // ⛔ disables type-aware linting for these
+        project: null,
       },
     },
     rules: {
       // ✅ turn off type-aware TS rules in non-type-aware files
-      ...tsConfigs.disableTypeChecked.rules,
+      ...tseslint.configs.disableTypeChecked.rules,
 
-      // --- Tiny, pragmatic relaxations for tooling code ---
-      'no-console': 'off', // configs/scripts often log intentionally
-      '@typescript-eslint/no-require-imports': 'off', // some tooling still uses require()
-
-      // If you use eslint-plugin-import rule `import/no-default-export`, config files often default export
-      // (Only matters if you enable that rule elsewhere)
+      'no-console': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
       'import/no-default-export': 'off',
     },
   },
 
-  // ✅ Override: tests can be a bit looser without weakening app code
+  // Tests/stories can be a bit looser
   {
     files: [
       '**/*.{test,spec}.{js,jsx,ts,tsx}',
@@ -251,13 +245,10 @@ const eslintConfig = [
       '**/*.stories.{js,jsx,ts,tsx}',
     ],
     rules: {
-      // Often too noisy in tests where effects are mocked or deps are intentional
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
 
   // Prettier conflict resolver must be last
-  eslintConfigPrettier,
-];
-
-export default eslintConfig;
+  eslintConfigPrettier
+);
