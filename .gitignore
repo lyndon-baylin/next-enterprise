@@ -24,6 +24,7 @@
 # misc
 .DS_Store
 *.pem
+vite-tsconfig-paths.log
 
 # debug
 npm-debug.log*
