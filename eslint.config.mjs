@@ -1,8 +1,10 @@
+/* eslint-disable import/no-named-as-default-member */
 // eslint.config.mjs
 import fs from 'node:fs';
 
 import eslint from '@eslint/js';
 import eslintPluginNext from '@next/eslint-plugin-next';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginImport from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
@@ -11,8 +13,7 @@ import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import { configs as storybookConfigs } from 'eslint-plugin-storybook';
 import unusedImports from 'eslint-plugin-unused-imports';
-import { defineConfig, globalIgnores } from 'eslint/config';
-import { configs as tsConfigs } from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
 const repoRoot = import.meta.dirname;
 
@@ -57,9 +58,9 @@ export default defineConfig(
   ...storybookConfigs['flat/recommended'],
 
   // TypeScript (type-aware)
-  ...tsConfigs.recommended,
-  ...tsConfigs.strictTypeChecked,
-  ...tsConfigs.stylisticTypeChecked,
+  ...tseslint.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
 
   // Import plugin
   eslintPluginImport.flatConfigs.recommended,
@@ -226,7 +227,7 @@ export default defineConfig(
     },
     rules: {
       // ✅ turn off type-aware TS rules in non-type-aware files
-      ...tsConfigs.disableTypeChecked.rules,
+      ...tseslint.configs.disableTypeChecked.rules,
 
       'no-console': 'off',
       '@typescript-eslint/no-require-imports': 'off',
