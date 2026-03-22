@@ -17,7 +17,7 @@ jobs:
       # ✅ Ensure pnpm is available before setup-node tries to use it for caching
       - uses: pnpm/action-setup@v4
         with:
-          version: 10.29.3
+          version: 10.32.1
 
       - name: Setup Node
         uses: actions/setup-node@v6
