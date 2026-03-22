@@ -174,8 +174,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1
       npm-check-updates:
-        specifier: 19.3.2
-        version: 19.3.2
+        specifier: 19.6.5
+        version: 19.6.5
       patch-package:
         specifier: 8.0.1
         version: 8.0.1
@@ -3599,8 +3599,8 @@ packages:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
 
-  npm-check-updates@19.3.2:
-    resolution: {integrity: sha512-9rr3z7znFjCSuaFxHGTFR2ZBOvLWaJcpLKmIquoTbDBNrwAGiHhv4MZyty6EJ9Xo/aMn35+2ISPSMgWIXx5Xkg==}
+  npm-check-updates@19.6.5:
+    resolution: {integrity: sha512-XlBUMC30relXfEerrnX239W9iB30U6Woz0Hj42Sv6iSF4EGOvj2mS2r45sZ3RglH0VPBxXOWooMxObZ/SMZhrw==}
     engines: {node: '>=20.0.0', npm: '>=8.12.1'}
     hasBin: true
 
@@ -8135,7 +8135,7 @@ snapshots:
 
   normalize-path@3.0.0: {}
 
-  npm-check-updates@19.3.2: {}
+  npm-check-updates@19.6.5: {}
 
   object-assign@4.1.1: {}
 
