@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
 const isDirnameDefined = typeof __dirname !== 'undefined';
@@ -21,7 +22,10 @@ export default defineConfig({
     browser: {
       enabled: true,
       headless: true,
-      provider: 'playwright',
+      provider: playwright({
+        launchOptions: { slowMo: 50 },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any,
       instances: [
         {
           browser: 'chromium',

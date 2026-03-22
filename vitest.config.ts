@@ -1,21 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="vitest/config" />
-import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
-  plugins: [
-    tsconfigPaths({
-      projectDiscovery: 'lazy',
-      logFile: true,
-    }),
-    react(),
-  ],
   test: {
     reporters: ['default', 'html'],
     environment: 'jsdom',
+    // Fixes weird URL-related bugs in tests
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
     setupFiles: './vitest.setup.ts',
     globals: true,
     mockReset: true,
@@ -41,7 +38,6 @@ export default defineConfig({
         '.storybook',
         'node_modules/',
         'scripts/**',
-        'test/**',
         'coverage/**',
         'html/**',
         'dist/**',
