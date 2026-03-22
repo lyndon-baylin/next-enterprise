@@ -219,8 +219,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0
       typed-query-selector:
-        specifier: 2.12.0
-        version: 2.12.0
+        specifier: 2.12.1
+        version: 2.12.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -4446,8 +4446,8 @@ packages:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
 
-  typed-query-selector@2.12.0:
-    resolution: {integrity: sha512-SbklCd1F0EiZOyPiW192rrHZzZ5sBijB6xM+cpmrwDqObvdtunOHHIk9fCGsoK5JVIYXoyEp4iEdE3upFH3PAg==}
+  typed-query-selector@2.12.1:
+    resolution: {integrity: sha512-uzR+FzI8qrUEIu96oaeBJmd9E7CFEiQ3goA5qCVgc4s5llSubcfGHq9yUstZx/k4s9dXHVKsE35YWoFyvEqEHA==}
 
   typescript-eslint@8.55.0:
     resolution: {integrity: sha512-HE4wj+r5lmDVS9gdaN0/+iqNvPZwGfnJ5lZuz7s5vLlg9ODw0bIiiETaios9LvFI1U94/VBXGm3CB2Y5cNFMpw==}
@@ -9115,7 +9115,7 @@ snapshots:
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
 
-  typed-query-selector@2.12.0: {}
+  typed-query-selector@2.12.1: {}
 
   typescript-eslint@8.55.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
