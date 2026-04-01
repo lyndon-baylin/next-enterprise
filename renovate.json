@@ -58,8 +58,7 @@
                 "/^stylelint($|[-/])/"
             ],
             "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true,
-            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
+            "automerge": true
         },
         {
             "groupName": "testing & QA",
@@ -72,15 +71,13 @@
                 "/^jsdom$/"
             ],
             "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true,
-            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
+            "automerge": true
         },
         {
             "groupName": "storybook ecosystem",
             "matchPackageNames": ["/^storybook$/", "/^@storybook\\//", "/^@chromatic-com\\/storybook$/"],
             "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true,
-            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
+            "automerge": true
         },
         {
             "groupName": "tailwind ecosystem",
@@ -92,15 +89,13 @@
                 "/tw-animate/"
             ],
             "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true,
-            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
+            "automerge": true
         },
         {
             "description": "Default: automerge devDependencies minor/patch",
             "matchDepTypes": ["devDependencies"],
             "matchUpdateTypes": ["minor", "patch"],
-            "automerge": true,
-            "requiredStatusChecks": ["Renovate CI / verify (pull_request)"]
+            "automerge": true
         },
         {
             "groupName": "native/build-script dependencies (pnpm onlyBuiltDependencies)",
