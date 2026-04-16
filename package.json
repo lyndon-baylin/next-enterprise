@@ -96,7 +96,7 @@
         "npm-check-updates": "19.6.6",
         "patch-package": "8.0.1",
         "playwright": "^1.58.2",
-        "postcss": "8.5.8",
+        "postcss": "8.5.9",
         "postcss-import": "16.1.1",
         "postinstall-postinstall": "2.1.0",
         "prettier": "3.8.1",
